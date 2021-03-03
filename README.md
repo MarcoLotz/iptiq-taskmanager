@@ -12,7 +12,7 @@ In order to build and perform tests, please run
 mvn clean verify
 ```
 
-Should an error pointing that 'marcolotz-parent cannot be found' prompt, please retrieve it from [here|https://github.com/marcolotz/parent].
+Should an error pointing that 'marcolotz-parent cannot be found' prompt, please retrieve it from [here](https://github.com/marcolotz/parent).
 After retrieving it,  install the parent pom version 1.0.0 in your local maven repository with:
 
 ```shell
