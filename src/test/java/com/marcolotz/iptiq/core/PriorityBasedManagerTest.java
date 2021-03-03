@@ -13,12 +13,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("When performing operations on a priority queue manager")
-class PriorityTaskManagerTest extends SimpleTaskManagerTest {
+@DisplayName("When performing operations on a priority based task manager")
+class PriorityBasedManagerTest extends SimpleTaskManagerTest {
 
   @BeforeEach
   void setUp() {
-    taskManager = new PriorityQueueTaskManager(EXPECTED_SIZE, new SequentialTimeProvider());
+    taskManager = new PriorityBasedTaskManager(EXPECTED_SIZE, new SequentialTimeProvider());
   }
 
   @DisplayName("then it's dropped it not lower priority is available")

@@ -21,8 +21,8 @@ import lombok.Synchronized;
 public class SimpleTaskManager implements TaskManager {
 
   protected final int capacity;
-  protected Collection<AcceptedProcessDecorator> tasks = new LinkedList<>();
   protected final TimeProvider timeProvider;
+  protected Collection<AcceptedProcessDecorator> tasks = new LinkedList<>();
 
   public SimpleTaskManager(final int capacity, final TimeProvider timeProvider) {
     if (capacity < 1) {

@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.marcolotz.iptiq.core.model.AcceptedProcessDecorator;
 import com.marcolotz.iptiq.core.model.Process;
 import com.marcolotz.iptiq.ports.TimeProvider;
+import com.marcolotz.iptiq.utils.SequentialTimeProvider;
 import java.util.List;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +23,7 @@ class SortingMethodTest {
   final Process medium = new Process(MEDIUM);
   final Process high = new Process(HIGH);
 
-  final TimeProvider timeProvider = new MockTimeProvider();
+  final TimeProvider timeProvider = new SequentialTimeProvider();
 
   List<AcceptedProcessDecorator> inputList;
 
@@ -33,7 +34,7 @@ class SortingMethodTest {
         new AcceptedProcessDecorator(high, timeProvider.getTime()));
   }
 
-  @DisplayName("Then it should return a descending list of id number")
+  @DisplayName("then it should return a descending list of id number")
   @Test
   void whenSortingByIdThenReturnListWithDescendingIdNumber() {
     // Given
@@ -48,7 +49,7 @@ class SortingMethodTest {
     assertThat(second.getPid()).isGreaterThan(third.getPid());
   }
 
-  @DisplayName("Then it should return a descending list of priorities")
+  @DisplayName("then it should return a descending list of priorities")
   @Test
   void whenSortingByPriorityThenReturnListWithDescendingPriority() {
     // Given
@@ -64,7 +65,7 @@ class SortingMethodTest {
     assertEquals(LOW, third.getPriority());
   }
 
-  @DisplayName("Then it should return a descending list of priorities")
+  @DisplayName("then it should return a descending list of priorities")
   @Test
   void whenSortingByIngestionTimeThenReturnListWithDescendingIngestionTime() {
     // Given
@@ -78,7 +79,8 @@ class SortingMethodTest {
     inputList.sort(SortingMethod.CREATION_TIME.comparator());
 
     // Expect
-    assertThat(inputList.stream().map(AcceptedProcessDecorator::getProcess)).containsExactly(low, medium, high); // based on ingestion sequence
+    assertThat(inputList.stream().map(AcceptedProcessDecorator::getProcess))
+        .containsExactly(low, medium, high); // based on ingestion sequence
   }
 
 

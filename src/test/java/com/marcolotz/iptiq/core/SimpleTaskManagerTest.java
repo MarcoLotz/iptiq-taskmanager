@@ -10,11 +10,11 @@ import static org.mockito.Mockito.verify;
 
 import com.marcolotz.iptiq.core.exceptions.MaximumCapacityReachedException;
 import com.marcolotz.iptiq.core.exceptions.ProcessNotFoundException;
-import com.marcolotz.iptiq.core.model.AbstractProcess;
 import com.marcolotz.iptiq.core.model.AcceptedProcessDecorator;
 import com.marcolotz.iptiq.core.model.Priority;
 import com.marcolotz.iptiq.core.model.Process;
 import com.marcolotz.iptiq.ports.TaskManager;
+import com.marcolotz.iptiq.utils.SequentialTimeProvider;
 import java.time.Instant;
 import java.util.List;
 import lombok.SneakyThrows;
@@ -30,7 +30,7 @@ class SimpleTaskManagerTest {
 
   @BeforeEach
   void setUp() {
-    taskManager = new SimpleTaskManager(EXPECTED_SIZE, new MockTimeProvider());
+    taskManager = new SimpleTaskManager(EXPECTED_SIZE, new SequentialTimeProvider());
   }
 
   @DisplayName("then capacities below 1 are not accepted")
@@ -40,7 +40,7 @@ class SimpleTaskManagerTest {
     final int capacity = 0;
 
     // Expect
-    assertThrows(IllegalArgumentException.class, () -> new SimpleTaskManager(capacity, new MockTimeProvider()));
+    assertThrows(IllegalArgumentException.class, () -> new SimpleTaskManager(capacity, new SequentialTimeProvider()));
   }
 
   @DisplayName("then processes can be added until capacity is reached")
@@ -64,8 +64,7 @@ class SimpleTaskManagerTest {
   @DisplayName("then a process can be killed")
   @Test
   @SneakyThrows
-  void whenKillingProcess_thenItIsRemovedFromTaskManager()
-  {
+  void whenKillingProcess_thenItIsRemovedFromTaskManager() {
     // Given
     populateWithProcess(1, LOW);
     final Process killedProcess = spy(new Process(LOW));
@@ -80,8 +79,7 @@ class SimpleTaskManagerTest {
 
   @DisplayName("then when processes are not found exception is thrown")
   @Test
-  void whenKillingProcess_thenExceptionIsThrownWhenNoProcessIsFound()
-  {
+  void whenKillingProcess_thenExceptionIsThrownWhenNoProcessIsFound() {
     // Given
     populateWithProcess(2, LOW);
     final Process killedProcess = new Process(LOW);
@@ -93,8 +91,7 @@ class SimpleTaskManagerTest {
   @DisplayName("then only processes in the expected group are killed")
   @Test
   @SneakyThrows
-  void whenKillingProcessInAGroup_thenKillOnlyThatGroup()
-  {
+  void whenKillingProcessInAGroup_thenKillOnlyThatGroup() {
     // Given
     var lowProcess = new Process(LOW);
     taskManager.addProcess(lowProcess);
@@ -111,8 +108,7 @@ class SimpleTaskManagerTest {
   }
 
   @DisplayName("Then kill all kills all processes")
-  void whenKillingAllProcess_thenAllProcessesAreKilled()
-  {
+  void whenKillingAllProcess_thenAllProcessesAreKilled() {
     // Given
     populateWithProcess(2, LOW);
 
@@ -123,10 +119,9 @@ class SimpleTaskManagerTest {
     assertThat(taskManager.listRunningProcess(SortingMethod.ID)).hasSize(0);
   }
 
-  @DisplayName("Then listing running process by id order them by id")
+  @DisplayName("then listing running process by id order them by id")
   @Test
-  void whenListingById_ThenItReturnsAllProcessesSortedById()
-  {
+  void whenListingById_ThenItReturnsAllProcessesSortedById() {
     // Given
     populateWithProcess(2, LOW);
 
@@ -135,15 +130,14 @@ class SimpleTaskManagerTest {
 
     // Then
     assertThat(runningProcesses).hasSize(2);
-    assertThat(runningProcesses.stream().map(p-> new AcceptedProcessDecorator(p, Instant.now())))
+    assertThat(runningProcesses.stream().map(p -> new AcceptedProcessDecorator(p, Instant.now())))
         .isSortedAccordingTo(SortingMethod.ID.comparator());
   }
 
-  @DisplayName("Then listing running process by id order them by priority")
+  @DisplayName("then listing running process by id order them by priority")
   @Test
   @SneakyThrows
-  void whenListingByPriority_ThenItReturnsAllProcessesSortedByPriority()
-  {
+  void whenListingByPriority_ThenItReturnsAllProcessesSortedByPriority() {
     // Given
     var lowProcess = new Process(LOW);
     taskManager.addProcess(lowProcess);
@@ -158,11 +152,10 @@ class SimpleTaskManagerTest {
     assertThat(runningProcesses).containsExactly(mediumProcess, lowProcess);
   }
 
-  @DisplayName("Then listing running process by id order them by creatingTime")
+  @DisplayName("then listing running process by id order them by creatingTime")
   @Test
   @SneakyThrows
-  void whenListingByCreationTime_ThenItReturnsAllProcessesSortedByCreationTime()
-  {
+  void whenListingByCreationTime_ThenItReturnsAllProcessesSortedByCreationTime() {
     // Given
     var lowProcess = new Process(LOW);
     taskManager.addProcess(lowProcess);

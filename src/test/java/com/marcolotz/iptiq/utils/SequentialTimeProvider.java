@@ -1,9 +1,9 @@
-package com.marcolotz.iptiq.core;
+package com.marcolotz.iptiq.utils;
 
 import com.marcolotz.iptiq.ports.TimeProvider;
 import java.time.Instant;
 
-public class MockTimeProvider implements TimeProvider {
+public class SequentialTimeProvider implements TimeProvider {
 
   Instant baseInstant = Instant.now();
 
