@@ -63,4 +63,18 @@
     </dependency>
   </dependencies>
 
+  <repositories>
+    <repository>
+      <id>github</id>
+      <name>GitHub Marco Lotz Public Apache Maven Packages</name>
+      <url>https://maven.pkg.github.com/MarcoLotz/public</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
 </project>

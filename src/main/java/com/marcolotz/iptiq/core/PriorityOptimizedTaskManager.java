@@ -22,14 +22,14 @@ import lombok.Synchronized;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2
-public class PriorityBasedTaskManager implements TaskManager {
+public class PriorityOptimizedTaskManager implements TaskManager {
 
   private final int capacity;
   private final Map<Priority, Map<UUID, AcceptedProcessDecorator>> taskQueues;
   private final List<Priority> prioritiesInAscendingOrder;
   private final TimeProvider timeProvider;
 
-  public PriorityBasedTaskManager(final int capacity, final TimeProvider timeProvider) {
+  public PriorityOptimizedTaskManager(final int capacity, final TimeProvider timeProvider) {
     this.capacity = capacity;
     this.taskQueues = new HashMap<>();
     this.prioritiesInAscendingOrder = Arrays.stream(Priority.values().clone())
