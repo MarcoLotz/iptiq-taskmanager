@@ -2,7 +2,24 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns="http://maven.apache.org/POM/4.0.0"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.marcolotz</groupId>
+    <artifactId>marcolotz-parent</artifactId>
+    <version>1.0.0</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>org.example</groupId>
   <artifactId>iptiq-taskmanager</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <properties>
+    <maven.compiler.source>13</maven.compiler.source>
+    <maven.compiler.target>13</maven.compiler.target>
+  </properties>
 
   <dependencies>
     <dependency>
@@ -45,22 +62,5 @@
       <groupId>org.assertj</groupId>
     </dependency>
   </dependencies>
-
-  <groupId>org.example</groupId>
-
-  <modelVersion>4.0.0</modelVersion>
-  <packaging>jar</packaging>
-  <parent>
-    <artifactId>marcolotz-parent</artifactId>
-    <groupId>com.marcolotz</groupId>
-    <version>1.0</version>
-  </parent>
-
-  <properties>
-    <maven.compiler.source>13</maven.compiler.source>
-    <maven.compiler.target>13</maven.compiler.target>
-  </properties>
-
-  <version>1.0-SNAPSHOT</version>
 
 </project>
