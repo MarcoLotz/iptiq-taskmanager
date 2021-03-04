@@ -42,7 +42,7 @@ I tested to make sure that Liskov's Substitution Principle holds on all cases.
 As one can see, the tests extend a base test.
 Unless for behaviours that we intentionally changed in the subclass, all classes are also tested against expected original behaviours.
 
-As time goes, one also learn to never have time manipulation using sleep or any other idle work inside tests.
+As time goes, one also learns to never have time manipulation using sleep or any other idle work inside tests.
 Dependency Injection and Interface Segregation comes really in hand when I provided a test only implementation of TimeProvider - making sure that all events happen in sequence and in distinct seconds without requiring sleep() calls.
 
 ## Inheritance
