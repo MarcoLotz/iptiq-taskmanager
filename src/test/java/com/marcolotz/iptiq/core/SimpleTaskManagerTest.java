@@ -1,5 +1,20 @@
 package com.marcolotz.iptiq.core;
 
+import com.marcolotz.iptiq.core.exceptions.MaximumCapacityReachedException;
+import com.marcolotz.iptiq.core.exceptions.ProcessNotFoundException;
+import com.marcolotz.iptiq.core.model.AcceptedProcessDecorator;
+import com.marcolotz.iptiq.core.model.Priority;
+import com.marcolotz.iptiq.core.model.Process;
+import com.marcolotz.iptiq.ports.TaskManager;
+import com.marcolotz.iptiq.utils.SequentialTimeProvider;
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import java.time.Instant;
+import java.util.List;
+
 import static com.marcolotz.iptiq.core.model.Priority.LOW;
 import static com.marcolotz.iptiq.core.model.Priority.MEDIUM;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -8,165 +23,151 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
-import com.marcolotz.iptiq.core.exceptions.MaximumCapacityReachedException;
-import com.marcolotz.iptiq.core.exceptions.ProcessNotFoundException;
-import com.marcolotz.iptiq.core.model.AcceptedProcessDecorator;
-import com.marcolotz.iptiq.core.model.Priority;
-import com.marcolotz.iptiq.core.model.Process;
-import com.marcolotz.iptiq.ports.TaskManager;
-import com.marcolotz.iptiq.utils.SequentialTimeProvider;
-import java.time.Instant;
-import java.util.List;
-import lombok.SneakyThrows;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
 @DisplayName("When performing operations on a simple task manager")
 class SimpleTaskManagerTest {
 
-  protected static final int EXPECTED_SIZE = 2;
-  protected TaskManager taskManager;
+    protected static final int EXPECTED_SIZE = 2;
+    protected TaskManager taskManager;
 
-  @BeforeEach
-  void setUp() {
-    taskManager = new SimpleTaskManager(EXPECTED_SIZE, new SequentialTimeProvider());
-  }
-
-  @DisplayName("then capacities below 1 are not accepted")
-  @Test
-  void whenCapacityIsBelow1_thenExceptionIsThrown() {
-    // Given
-    final int capacity = 0;
-
-    // Expect
-    assertThrows(IllegalArgumentException.class, () -> new SimpleTaskManager(capacity, new SequentialTimeProvider()));
-  }
-
-  @DisplayName("then processes can be added until capacity is reached")
-  @Test
-  void whenProcessesAreAdded_thenTaskManagerHandlesUntilCapacity() {
-    // Given
-    populateWithProcess(EXPECTED_SIZE, LOW);
-
-    // Expect
-    assertThrows(MaximumCapacityReachedException.class, () -> taskManager.addProcess(new Process(LOW)));
-  }
-
-  @SneakyThrows
-  protected void populateWithProcess(final int numberOfProcesses, final Priority priority) {
-    for (int i = 0; i < numberOfProcesses; i++) {
-      var p = new Process(priority);
-      taskManager.addProcess(p);
+    @BeforeEach
+    void setUp() {
+        taskManager = new SimpleTaskManager(EXPECTED_SIZE, new SequentialTimeProvider());
     }
-  }
 
-  @DisplayName("then a process can be killed")
-  @Test
-  @SneakyThrows
-  void whenKillingProcess_thenItIsRemovedFromTaskManager() {
-    // Given
-    populateWithProcess(1, LOW);
-    final Process killedProcess = spy(new Process(LOW));
-    taskManager.addProcess(killedProcess);
+    @DisplayName("then capacities below 1 are not accepted")
+    @Test
+    void whenCapacityIsBelow1_thenExceptionIsThrown() {
+        // Given
+        final int capacity = 0;
 
-    // When
-    taskManager.killProcess(killedProcess.getPid().toString());
+        // Expect
+        assertThrows(IllegalArgumentException.class, () -> new SimpleTaskManager(capacity, new SequentialTimeProvider()));
+    }
 
-    // Expect
-    verify(killedProcess).kill();
-  }
+    @DisplayName("then processes can be added until capacity is reached")
+    @Test
+    void whenProcessesAreAdded_thenTaskManagerHandlesUntilCapacity() {
+        // Given
+        populateWithProcess(EXPECTED_SIZE, LOW);
 
-  @DisplayName("then when processes are not found exception is thrown")
-  @Test
-  void whenKillingProcess_thenExceptionIsThrownWhenNoProcessIsFound() {
-    // Given
-    populateWithProcess(2, LOW);
-    final Process killedProcess = new Process(LOW);
+        // Expect
+        assertThrows(MaximumCapacityReachedException.class, () -> taskManager.addProcess(new Process(LOW)));
+    }
 
-    // Expect
-    assertThrows(ProcessNotFoundException.class, () -> taskManager.killProcess(killedProcess.getPid().toString()));
-  }
+    @SneakyThrows
+    protected void populateWithProcess(final int numberOfProcesses, final Priority priority) {
+        for (int i = 0; i < numberOfProcesses; i++) {
+            var p = new Process(priority);
+            taskManager.addProcess(p);
+        }
+    }
 
-  @DisplayName("then only processes in the expected group are killed")
-  @Test
-  @SneakyThrows
-  void whenKillingProcessInAGroup_thenKillOnlyThatGroup() {
-    // Given
-    var lowProcess = new Process(LOW);
-    taskManager.addProcess(lowProcess);
-    var mediumProcess = new Process(MEDIUM);
-    taskManager.addProcess(mediumProcess);
+    @DisplayName("then a process can be killed")
+    @Test
+    @SneakyThrows
+    void whenKillingProcess_thenItIsRemovedFromTaskManager() {
+        // Given
+        populateWithProcess(1, LOW);
+        final Process killedProcess = spy(new Process(LOW));
+        taskManager.addProcess(killedProcess);
 
-    // When
-    taskManager.killGroup(LOW);
+        // When
+        taskManager.killProcess(killedProcess.getPid().toString());
 
-    // Expect
-    List<Process> runningProcesses = taskManager.listRunningProcess(SortingMethod.ID);
-    assertThat(runningProcesses).hasSize(1);
-    assertEquals(mediumProcess, runningProcesses.get(0));
-  }
+        // Expect
+        verify(killedProcess).kill();
+    }
 
-  @DisplayName("Then kill all kills all processes")
-  void whenKillingAllProcess_thenAllProcessesAreKilled() {
-    // Given
-    populateWithProcess(2, LOW);
+    @DisplayName("then when processes are not found exception is thrown")
+    @Test
+    void whenKillingProcess_thenExceptionIsThrownWhenNoProcessIsFound() {
+        // Given
+        populateWithProcess(2, LOW);
+        final Process killedProcess = new Process(LOW);
 
-    // When
-    taskManager.killAll();
+        // Expect
+        assertThrows(ProcessNotFoundException.class, () -> taskManager.killProcess(killedProcess.getPid().toString()));
+    }
 
-    // Then
-    assertThat(taskManager.listRunningProcess(SortingMethod.ID)).hasSize(0);
-  }
+    @DisplayName("then only processes in the expected group are killed")
+    @Test
+    @SneakyThrows
+    void whenKillingProcessInAGroup_thenKillOnlyThatGroup() {
+        // Given
+        var lowProcess = new Process(LOW);
+        taskManager.addProcess(lowProcess);
+        var mediumProcess = new Process(MEDIUM);
+        taskManager.addProcess(mediumProcess);
 
-  @DisplayName("then listing running process by id order them by id")
-  @Test
-  void whenListingById_ThenItReturnsAllProcessesSortedById() {
-    // Given
-    populateWithProcess(2, LOW);
+        // When
+        taskManager.killGroup(LOW);
 
-    // When
-    List<Process> runningProcesses = taskManager.listRunningProcess(SortingMethod.ID);
+        // Expect
+        List<Process> runningProcesses = taskManager.listRunningProcess(SortingMethod.ID);
+        assertThat(runningProcesses).hasSize(1);
+        assertEquals(mediumProcess, runningProcesses.get(0));
+    }
 
-    // Then
-    assertThat(runningProcesses).hasSize(2);
-    assertThat(runningProcesses.stream().map(p -> new AcceptedProcessDecorator(p, Instant.now())))
-        .isSortedAccordingTo(SortingMethod.ID.comparator());
-  }
+    @DisplayName("Then kill all kills all processes")
+    void whenKillingAllProcess_thenAllProcessesAreKilled() {
+        // Given
+        populateWithProcess(2, LOW);
 
-  @DisplayName("then listing running process by id order them by priority")
-  @Test
-  @SneakyThrows
-  void whenListingByPriority_ThenItReturnsAllProcessesSortedByPriority() {
-    // Given
-    var lowProcess = new Process(LOW);
-    taskManager.addProcess(lowProcess);
-    var mediumProcess = new Process(MEDIUM);
-    taskManager.addProcess(mediumProcess);
+        // When
+        taskManager.killAll();
 
-    // When
-    List<Process> runningProcesses = taskManager.listRunningProcess(SortingMethod.PRIORITY);
+        // Then
+        assertThat(taskManager.listRunningProcess(SortingMethod.ID)).hasSize(0);
+    }
 
-    // Then
-    assertThat(runningProcesses).hasSize(2);
-    assertThat(runningProcesses).containsExactly(mediumProcess, lowProcess);
-  }
+    @DisplayName("then listing running process by id order them by id")
+    @Test
+    void whenListingById_ThenItReturnsAllProcessesSortedById() {
+        // Given
+        populateWithProcess(2, LOW);
 
-  @DisplayName("then listing running process by id order them by creatingTime")
-  @Test
-  @SneakyThrows
-  void whenListingByCreationTime_ThenItReturnsAllProcessesSortedByCreationTime() {
-    // Given
-    var lowProcess = new Process(LOW);
-    taskManager.addProcess(lowProcess);
-    var mediumProcess = new Process(MEDIUM);
-    taskManager.addProcess(mediumProcess);
+        // When
+        List<Process> runningProcesses = taskManager.listRunningProcess(SortingMethod.ID);
 
-    // When
-    List<Process> runningProcesses = taskManager.listRunningProcess(SortingMethod.CREATION_TIME);
+        // Then
+        assertThat(runningProcesses).hasSize(2);
+        assertThat(runningProcesses.stream().map(p -> new AcceptedProcessDecorator(p, Instant.now())))
+            .isSortedAccordingTo(SortingMethod.ID.comparator());
+    }
 
-    // Then
-    assertThat(runningProcesses).hasSize(2);
-    assertThat(runningProcesses).containsExactly(lowProcess, mediumProcess);
-  }
+    @DisplayName("then listing running process by id order them by priority")
+    @Test
+    @SneakyThrows
+    void whenListingByPriority_ThenItReturnsAllProcessesSortedByPriority() {
+        // Given
+        var lowProcess = new Process(LOW);
+        taskManager.addProcess(lowProcess);
+        var mediumProcess = new Process(MEDIUM);
+        taskManager.addProcess(mediumProcess);
+
+        // When
+        List<Process> runningProcesses = taskManager.listRunningProcess(SortingMethod.PRIORITY);
+
+        // Then
+        assertThat(runningProcesses).hasSize(2);
+        assertThat(runningProcesses).containsExactly(mediumProcess, lowProcess);
+    }
+
+    @DisplayName("then listing running process by id order them by creatingTime")
+    @Test
+    @SneakyThrows
+    void whenListingByCreationTime_ThenItReturnsAllProcessesSortedByCreationTime() {
+        // Given
+        var lowProcess = new Process(LOW);
+        taskManager.addProcess(lowProcess);
+        var mediumProcess = new Process(MEDIUM);
+        taskManager.addProcess(mediumProcess);
+
+        // When
+        List<Process> runningProcesses = taskManager.listRunningProcess(SortingMethod.CREATION_TIME);
+
+        // Then
+        assertThat(runningProcesses).hasSize(2);
+        assertThat(runningProcesses).containsExactly(lowProcess, mediumProcess);
+    }
 }
