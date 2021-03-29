@@ -76,7 +76,9 @@
         <repository>
             <id>github</id>
             <name>GitHub Marco Lotz Public Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/MarcoLotz/public</url>
+            <!-- removes auth requirements to access Github packages.
+            https://stackoverflow.com/questions/64419343/how-to-reference-public-github-packages-from-maven-project -->
+            <url>https://marcolotz:d5c8e5b9f08888ab8eca0c1725c3ebecccddbfb0@maven.pkg.github.com/MarcoLotz/public</url>
             <releases>
                 <enabled>true</enabled>
             </releases>
