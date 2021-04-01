@@ -10,7 +10,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.marcolotz</groupId>
-    <artifactId>iptiq-taskmanager</artifactId>
+    <artifactId>taskmanager</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -74,17 +74,9 @@
 
     <repositories>
         <repository>
-            <id>github</id>
-            <name>GitHub Marco Lotz Public Apache Maven Packages</name>
-            <!-- removes auth requirements to access Github packages.
-            https://stackoverflow.com/questions/64419343/how-to-reference-public-github-packages-from-maven-project -->
-            <url>https://marcolotz:d5c8e5b9f08888ab8eca0c1725c3ebecccddbfb0@maven.pkg.github.com/MarcoLotz/public</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
+            <!-- as described here: https://github.community/t/download-from-github-package-registry-without-authentication/14407/110 -->
+            <id>github-public</id>
+            <url>https://public:&#103;hp_ST4DoYjjOdREWwYWLOCCuIgVB5DfhB2YlNe5@maven.pkg.github.com/marcolotz/*</url>
         </repository>
     </repositories>
 </project>
