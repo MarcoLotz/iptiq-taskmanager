@@ -66,6 +66,7 @@ public class TaskManagerController implements V1Api {
     }
 
     @Override
+    // TODO: Use pagination
     public ResponseEntity<List<RunningProcessDTO>> v1ProcessesGet(final @NotNull @Valid SortingMethodDTO sortingMethod) {
         final List<Process> runningProcesses = taskManager.listRunningProcess(mapper.fromSortingMethodDto(sortingMethod));
         final List<RunningProcessDTO> runningProcessDTOS =

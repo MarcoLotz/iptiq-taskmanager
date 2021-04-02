@@ -107,7 +107,7 @@
         <repository>
             <!-- as described here: https://github.community/t/download-from-github-package-registry-without-authentication/14407/110 -->
             <id>github-public</id>
-            <url>https://public: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@maven.pkg.github.com/marcolotz/*</url>
+            <url>https://public:&#103;hp_ln92MnOR8K9ln0zE56jP6k0FJR1Jsk0HV9Qt@maven.pkg.github.com/marcolotz/*</url>
         </repository>
     </repositories>
 </project>
