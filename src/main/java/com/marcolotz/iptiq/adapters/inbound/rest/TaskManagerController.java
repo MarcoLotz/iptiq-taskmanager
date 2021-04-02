@@ -17,9 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import javax.validation.constraints.DecimalMax;
-import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -38,7 +37,7 @@ public class TaskManagerController implements V1Api {
     protected DtoToDomainMapper mapper;
 
     @Override
-    public ResponseEntity<Void> v1ProcessesDelete(final @DecimalMin("0") @DecimalMax("50") @Valid List<String> pids,
+    public ResponseEntity<Void> v1ProcessesDelete(final @Size(max = 50) @Valid List<String> pids,
                                                   final @Valid PriorityTypes priorityGroup,
                                                   final @Valid Boolean killAll) {
         if (killAll) {
