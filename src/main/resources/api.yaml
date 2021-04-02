@@ -11,13 +11,22 @@ paths:
     get:
       summary: Returns a list of processes.
       description: returns a list of processes sorted by the selected sorting method
+      parameters:
+        - in: query
+          name: sortingMethod
+          required: true
+          description: method to sort the output data
+          schema:
+            $ref: '#/components/schemas/SortingMethodDTO'
       responses:
         '200':    # status code
           description: A JSON array of processes
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/RunningProcessDTO'
+                type: array
+                items:
+                  $ref: '#/components/schemas/RunningProcessDTO'
     put:
       summary: Adds a new process to the system
       description: adds a new process to the system
@@ -95,3 +104,10 @@ components:
         - LOW
         - MEDIUM
         - HIGH
+
+    SortingMethodDTO:
+      type: string
+      enum:
+        - CREATION_TIME
+        - PRIORITY
+        - ID
