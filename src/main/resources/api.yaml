@@ -1,0 +1,97 @@
+openapi: 3.0.0
+info:
+  title: Task Manager API
+  description: API to support task operations
+  version: 1.0.0
+servers:
+  - url: https://deployedhost:11306/v1
+    description: Default port and endpoint for the deployed server
+paths:
+  /v1/processes:
+    get:
+      summary: Returns a list of processes.
+      description: returns a list of processes sorted by the selected sorting method
+      responses:
+        '200':    # status code
+          description: A JSON array of processes
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunningProcessDTO'
+    put:
+      summary: Adds a new process to the system
+      description: adds a new process to the system
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddedProcessDTO'
+      responses:
+        '200':
+          description: Process was correctly added to the system
+
+    delete:
+      # Not really RESTful, but using a single delete per resource is also too I/O expensive.
+      # I rather breach REST here. More at: shorturl.at/lwxF7
+      parameters:
+        - in: query
+          name: pids
+          required: false
+          description: pids of processes to be killed
+          schema:
+            type : array
+            items:
+              type: string
+            minimum: 0
+            maximum: 50
+        - in: query
+          name: priorityGroup
+          required: false
+          description: Groups of process to be killed
+          schema:
+            type: object
+            allOf:
+              - $ref: '#/components/schemas/PriorityTypes'
+        - in: query
+          name: killAll
+          required: false
+          description: Kills all process
+          schema:
+            type: boolean
+            default: false
+
+
+      summary: Kills system processes
+      description: kills multiple system process based on filter scenario
+      responses:
+        '200':
+          description: Process has been correctly killed.
+        '404':
+          description: No process was found
+
+components:
+  schemas:
+
+    RunningProcessDTO:
+      properties:
+        pid:
+          type: string
+        priority:
+          nullable: false
+          allOf: # shorturl.at/oFKSV
+            - $ref: '#/components/schemas/PriorityTypes'
+
+    AddedProcessDTO:
+      properties:
+        priority:
+          nullable: false
+          allOf:
+            - $ref: '#/components/schemas/PriorityTypes'
+
+    PriorityTypes:
+      type: string
+      enum:
+        - LOW
+        - MEDIUM
+        - HIGH
