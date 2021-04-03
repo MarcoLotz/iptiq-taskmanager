@@ -31,7 +31,7 @@ import java.util.stream.Stream;
 public class TaskManagerController implements V1Api {
 
     @Autowired
-    protected TaskManager taskManager;
+    protected TaskManager asyncTaskManager;
 
     @Autowired
     protected DtoToDomainMapper mapper;
@@ -41,11 +41,11 @@ public class TaskManagerController implements V1Api {
                                                   final @Valid PriorityTypes priorityGroup,
                                                   final @Valid Boolean killAll) {
         if (killAll) {
-            taskManager.killAll();
+            asyncTaskManager.killAll();
         } else {
             final Set<String> pidsFromPriorityGroup = Optional.ofNullable(priorityGroup)
                 .map(mapper::fromPriorityType)
-                .map(type -> taskManager.listRunningProcess(SortingMethod.PRIORITY).stream().filter(p -> p.getPriority().equals(type))
+                .map(type -> asyncTaskManager.listRunningProcess(SortingMethod.PRIORITY).stream().filter(p -> p.getPriority().equals(type))
                     .map(Process::getPid)
                     .map(UUID::toString)
                     .collect(Collectors.toSet()))
@@ -55,7 +55,7 @@ public class TaskManagerController implements V1Api {
 
             try { // As an implementation decision, I think it makes sense to fail on the first error
                 for (final String pid : pidsToKill) {
-                    taskManager.killProcess(pid);
+                    asyncTaskManager.killProcess(pid);
                 }
             } catch (final ProcessNotFoundException e) {
                 log.error("Process couldn't not be found", e);
@@ -68,7 +68,7 @@ public class TaskManagerController implements V1Api {
     @Override
     // TODO: Use pagination
     public ResponseEntity<List<RunningProcessDTO>> v1ProcessesGet(final @NotNull @Valid SortingMethodDTO sortingMethod) {
-        final List<Process> runningProcesses = taskManager.listRunningProcess(mapper.fromSortingMethodDto(sortingMethod));
+        final List<Process> runningProcesses = asyncTaskManager.listRunningProcess(mapper.fromSortingMethodDto(sortingMethod));
         final List<RunningProcessDTO> runningProcessDTOS =
             runningProcesses.stream().map(mapper::toRunningProcessDto).collect(Collectors.toList());
         return ResponseEntity.ok(runningProcessDTOS);
@@ -77,7 +77,7 @@ public class TaskManagerController implements V1Api {
     @Override
     @SneakyThrows // TODO: Put controller advice
     public ResponseEntity<Void> v1ProcessesPut(final @Valid AddedProcessDTO addedProcessDTO) {
-        taskManager.addProcess(mapper.fromAddedProcessDTO(addedProcessDTO));
+        asyncTaskManager.addProcess(mapper.fromAddedProcessDTO(addedProcessDTO));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
