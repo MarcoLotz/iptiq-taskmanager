@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.marcolotz</groupId>
         <artifactId>marcolotz-parent</artifactId>
-        <version>1.0.8</version>
+        <version>1.0.9</version>
         <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -64,6 +64,11 @@
             <groupId>org.openapitools</groupId>
             <artifactId>jackson-databind-nullable</artifactId>
         </dependency>
+        <!-- Validation -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
         <!-- Test dependencies -->
         <dependency>
             <groupId>org.assertj</groupId>
@@ -85,6 +90,11 @@
             <artifactId>junit-jupiter-engine</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -94,8 +104,7 @@
                 <artifactId>openapi-generator-maven-plugin</artifactId>
                 <configuration>
                     <configOptions>
-                        <!-- https://www.baeldung.com/spring-deferred-result -->
-                        <responseWrapper>DeferredResult</responseWrapper>
+                        <responseWrapper>CompletableFuture</responseWrapper>
                     </configOptions>
                 </configuration>
             </plugin>
