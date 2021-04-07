@@ -36,6 +36,7 @@ class SimpleTaskManagerTest {
 
     @DisplayName("then capacities below 1 are not accepted")
     @Test
+    // TODO: This is actually from process container
     void whenCapacityIsBelow1_thenExceptionIsThrown() {
         // Given
         final int capacity = 0;
@@ -120,7 +121,7 @@ class SimpleTaskManagerTest {
         assertThat(taskManager.listRunningProcess(SortingMethod.ID)).hasSize(0);
     }
 
-    @DisplayName("then listing running process by id order them by id")
+    @DisplayName("then listing running process by id sorts them by id")
     @Test
     void whenListingById_ThenItReturnsAllProcessesSortedById() {
         // Given
@@ -135,7 +136,7 @@ class SimpleTaskManagerTest {
             .isSortedAccordingTo(SortingMethod.ID.comparator());
     }
 
-    @DisplayName("then listing running process by id order them by priority")
+    @DisplayName("then listing running process by id sorts them by priority")
     @Test
     @SneakyThrows
     void whenListingByPriority_ThenItReturnsAllProcessesSortedByPriority() {
@@ -153,7 +154,7 @@ class SimpleTaskManagerTest {
         assertThat(runningProcesses).containsExactly(mediumProcess, lowProcess);
     }
 
-    @DisplayName("then listing running process by id order them by creatingTime")
+    @DisplayName("then listing running process by id sorts them by creatingTime")
     @Test
     @SneakyThrows
     void whenListingByCreationTime_ThenItReturnsAllProcessesSortedByCreationTime() {
