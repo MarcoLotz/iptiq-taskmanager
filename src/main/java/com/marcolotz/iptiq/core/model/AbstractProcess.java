@@ -11,6 +11,7 @@ public abstract class AbstractProcess {
         log.info("Killing process: {}", this::toString);
     }
 
+    // TODO: Move fields to abstract class
     public abstract UUID getPid();
 
     public abstract Priority getPriority();

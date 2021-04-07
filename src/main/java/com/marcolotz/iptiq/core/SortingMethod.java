@@ -9,15 +9,12 @@ public enum SortingMethod {
     PRIORITY,
     ID;
 
-    SortingMethod() {
-    }
-
     public Comparator<AcceptedProcessDecorator> comparator() {
         if (this == CREATION_TIME) {
             return Comparator.comparing(AcceptedProcessDecorator::getCreationTime);
         }
         if (this == PRIORITY) {
-            return (p1, p2) -> p1.getPriority().getPriorityNumber() < p2.getPriority().getPriorityNumber() ? 1 : -1;
+            return Comparator.comparingInt((AcceptedProcessDecorator p) -> p.getPriority().getPriorityNumber()).reversed();
         } // can only be ID
         return (p1, p2) -> -p1.getPid().compareTo(p2.getPid());
     }
