@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class AcceptedProcessDecorator extends AbstractProcess {
+public class AcceptedProcessDecorator implements AbstractProcess {
 
     final Process process;
     final Instant creationTime;

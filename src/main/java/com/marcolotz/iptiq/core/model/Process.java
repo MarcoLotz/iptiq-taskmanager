@@ -1,11 +1,13 @@
 package com.marcolotz.iptiq.core.model;
 
 import lombok.Getter;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.UUID;
 
 @Getter
-public class Process extends AbstractProcess {
+@Log4j2
+public class Process implements AbstractProcess {
 
     final UUID pid;
     final Priority priority;
@@ -20,4 +22,8 @@ public class Process extends AbstractProcess {
         this.pid = UUID.randomUUID();
     }
 
+    @Override
+    public void kill() {
+        log.info("Killing process: {}", this::toString);
+    }
 }

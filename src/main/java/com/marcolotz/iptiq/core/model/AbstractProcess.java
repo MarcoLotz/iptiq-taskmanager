@@ -1,18 +1,12 @@
 package com.marcolotz.iptiq.core.model;
 
-import lombok.extern.log4j.Log4j2;
-
 import java.util.UUID;
 
-@Log4j2
-public abstract class AbstractProcess {
+public interface AbstractProcess {
 
-    public void kill() {
-        log.info("Killing process: {}", this::toString);
-    }
+    void kill();
 
-    // TODO: Move fields to abstract class
-    public abstract UUID getPid();
+    UUID getPid();
 
-    public abstract Priority getPriority();
+    Priority getPriority();
 }
