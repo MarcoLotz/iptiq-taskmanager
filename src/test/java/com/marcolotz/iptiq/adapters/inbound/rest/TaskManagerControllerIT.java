@@ -30,7 +30,7 @@ import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.asyncDispatch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = TaskManagerController.class)
@@ -72,13 +72,13 @@ class TaskManagerControllerIT {
     @Test
     @DisplayName("then it will create processes if capacity allows")
     @SneakyThrows
-    void whenValidPutRequest_thenCreateProcess() {
+    void whenValidPostRequest_thenCreateProcess() {
         // Given
         AddedProcessDTO addedProcessDTO = new AddedProcessDTO();
         addedProcessDTO.setPriority(PriorityTypes.HIGH);
         doNothing().when(taskManager).addProcess(any());
 
-        final MvcResult result = mockMvc.perform(put("/v1/processes")
+        final MvcResult result = mockMvc.perform(post("/v1/processes")
             .content(asJsonString(addedProcessDTO))
             .contentType(MediaType.APPLICATION_JSON))
             .andReturn();
@@ -103,7 +103,7 @@ class TaskManagerControllerIT {
 
         doThrow(new MaximumCapacityReachedException("boom")).when(taskManager).addProcess(any());
 
-        final MvcResult result = mockMvc.perform(put("/v1/processes")
+        final MvcResult result = mockMvc.perform(post("/v1/processes")
             .content(asJsonString(addedProcessDTO))
             .contentType(MediaType.APPLICATION_JSON))
             .andReturn();

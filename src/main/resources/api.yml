@@ -27,7 +27,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/RunningProcessDTO'
-    put:
+    post:
       summary: Adds a new process to the system
       description: adds a new process to the system
       requestBody:

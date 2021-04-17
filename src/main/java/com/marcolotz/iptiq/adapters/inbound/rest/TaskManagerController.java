@@ -89,8 +89,7 @@ public class TaskManagerController implements V1Api {
     }
 
     @Override
-    // Note - In this case, I rather use exception handler inside the controller than on a global ControllerAdvice
-    public CompletableFuture<ResponseEntity<Void>> v1ProcessesPut(final @Valid AddedProcessDTO addedProcessDTO) {
+    public CompletableFuture<ResponseEntity<Void>> v1ProcessesPost(final @Valid AddedProcessDTO addedProcessDTO) {
         log.debug("Creating the following process: {}", addedProcessDTO::toString);
 
         return CompletableFuture.supplyAsync(() -> {
