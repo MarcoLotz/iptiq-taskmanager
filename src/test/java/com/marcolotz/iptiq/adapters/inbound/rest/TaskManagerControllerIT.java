@@ -11,23 +11,19 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.factory.Mappers;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -43,17 +39,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 // Keep in mind that ComponentScan doesn't play well with WebMvcTest: https://tinyurl.com/27nn5yws
 class TaskManagerControllerIT {
 
+    private final ObjectMapper serializer = new ObjectMapper();
     @MockBean
     private TaskManager taskManager;
-
     @Autowired
     private MockMvc mockMvc;
 
-    private final ObjectMapper serializer = new ObjectMapper();
-
     @BeforeEach
-    void setup()
-    {
+    void setup() {
         reset(taskManager);
     }
 
@@ -61,10 +54,18 @@ class TaskManagerControllerIT {
     @DisplayName("then all running processes will be provided with the required sorting method")
     @SneakyThrows
     void whenValidGetRequest_thenListProcesses() {
-        mockMvc.perform(get("/v1/processes").param("sortingMethod", "CREATION_TIME")
+        // Given
+        doReturn(Collections.emptyList()).when(taskManager).listRunningProcess(SortingMethod.CREATION_TIME);
+
+        final MvcResult result = mockMvc.perform(get("/v1/processes").param("sortingMethod", "CREATION_TIME")
             .contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
+
+        // When
+        mockMvc.perform(asyncDispatch(result))
             .andExpect(status().isOk());
 
+        // Then
         verify(taskManager).listRunningProcess(SortingMethod.CREATION_TIME);
     }
 
@@ -75,21 +76,26 @@ class TaskManagerControllerIT {
         // Given
         AddedProcessDTO addedProcessDTO = new AddedProcessDTO();
         addedProcessDTO.setPriority(PriorityTypes.HIGH);
+        doNothing().when(taskManager).addProcess(any());
 
-        // Expect
-        mockMvc.perform(put("/v1/processes")
+        final MvcResult result = mockMvc.perform(put("/v1/processes")
             .content(asJsonString(addedProcessDTO))
             .contentType(MediaType.APPLICATION_JSON))
+            .andReturn();
+
+        // When
+        mockMvc.perform(asyncDispatch(result))
             .andExpect(status().isOk());
 
+        // Expect
         verify(taskManager).addProcess(any());
     }
 
     @Test
     @DisplayName("then it will return a 503 if the capacity is exceeded")
     @SneakyThrows
-    // Async tests require a different testing format:
-    // https://stackoverflow.com/questions/46908906/spring-boot-returning-wrong-status-code-only-in-unit-test
+        // Async tests require a different testing format:
+        // https://stackoverflow.com/questions/46908906/spring-boot-returning-wrong-status-code-only-in-unit-test
     void whenCapacityIsFull_thenDenyProcessCreation() {
         // Given
         AddedProcessDTO addedProcessDTO = new AddedProcessDTO();
@@ -112,8 +118,7 @@ class TaskManagerControllerIT {
     @Test
     @DisplayName("Then it will kill all process if requested")
     @SneakyThrows
-    void whenKillAllIsEnabled_ThenAllProcessAreKilled()
-    {
+    void whenKillAllIsEnabled_ThenAllProcessAreKilled() {
         // Given
         doNothing().when(taskManager).killAll();
 
@@ -131,8 +136,7 @@ class TaskManagerControllerIT {
     @Test
     @DisplayName("Then it will kill only the pids in the list")
     @SneakyThrows
-    void whenPidsAreListed_ThenProcessesWithThatPidsWillBeKilled()
-    {
+    void whenPidsAreListed_ThenProcessesWithThatPidsWillBeKilled() {
         // Given
         final String pid1 = "1";
         final String pid2 = "2";
@@ -154,8 +158,7 @@ class TaskManagerControllerIT {
     @Test
     @DisplayName("Then it will return a 404 if a pid is not found")
     @SneakyThrows
-    void whenNotFoundPidIsListed_ThenReturnNotFoundStatus()
-    {
+    void whenNotFoundPidIsListed_ThenReturnNotFoundStatus() {
         // Given
         final String pid1 = "1";
         final String pid2 = "2";

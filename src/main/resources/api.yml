@@ -52,7 +52,7 @@ paths:
           description: pids of processes to be killed
           schema:
             type: array
-            default: [] # Empty array instead of null
+            default: [ ] # Empty array instead of null
             items:
               type: string
             maxItems: 50

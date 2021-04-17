@@ -36,7 +36,7 @@ class SimpleTaskManagerTest {
 
     @DisplayName("then capacities below 1 are not accepted")
     @Test
-    // TODO: This is actually from process container
+        // TODO: This is actually from process container
     void whenCapacityIsBelow1_thenExceptionIsThrown() {
         // Given
         final int capacity = 0;
