@@ -5,6 +5,7 @@ import org.springframework.validation.annotation.Validated;
 
 import javax.validation.constraints.Min;
 
+
 @Data
 @Validated
 public class TaskManagerConfigurationProperties {

@@ -26,7 +26,7 @@ public class TaskManagerConfiguration {
 
 
     @Bean
-    @ConfigurationProperties("taskmanager")
+    @ConfigurationProperties(prefix = "taskmanager")
     public TaskManagerConfigurationProperties taskManagerConfigurationProperties() {
         return new TaskManagerConfigurationProperties();
     }

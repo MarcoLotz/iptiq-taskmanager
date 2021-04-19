@@ -1,2 +1,6 @@
 taskmanager:
   capacity: 10
+
+spring:
+  main:
+    banner-mode: off
